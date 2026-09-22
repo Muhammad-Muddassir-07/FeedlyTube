@@ -45,11 +45,12 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
   onSelectVideo,
   onOpenChannel,
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [seekSeconds, setSeekSeconds] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState(video.watchProgressSeconds || 525);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.25);
   const [isMuted, setIsMuted] = useState(false);
-  const [useNativeEmbed, setUseNativeEmbed] = useState(false);
+  const [useNativeEmbed, setUseNativeEmbed] = useState(true);
   const [notesOpen, setNotesOpen] = useState(true);
   const [activeChapterIndex, setActiveChapterIndex] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -83,11 +84,14 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = Number(e.target.value);
     setCurrentTime(newTime);
+    setSeekSeconds(newTime);
   };
 
   const jumpToChapter = (chapter: Chapter, index: number) => {
     setCurrentTime(chapter.seconds);
     setActiveChapterIndex(index);
+    setSeekSeconds(chapter.seconds);
+    setUseNativeEmbed(true);
     setIsPlaying(true);
   };
 
@@ -111,6 +115,10 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
     .filter((v) => v.id !== video.id)
     .slice(0, 3);
 
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${video.youtubeVideoId}?autoplay=1&rel=0&modestbranding=1${
+    seekSeconds !== null ? `&start=${seekSeconds}` : ''
+  }`;
+
   return (
     <div id="video-player-container" className="max-w-2xl mx-auto px-4 sm:px-6 pt-2 pb-32">
       {/* Top Bar (Matching Image 1: Back arrow, Logo, Video Player, Avatar) */}
@@ -131,11 +139,23 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
           </span>
         </div>
 
-        <img
-          src={user.avatar}
-          alt={user.name}
-          className="w-7 h-7 rounded-full object-cover ring-1 ring-white/10"
-        />
+        <div className="flex items-center gap-2">
+          <a
+            href={video.youtubeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1 text-xs text-[#06B6D4] hover:underline flex items-center gap-1 bg-[#13161B] px-2 py-1 rounded-lg border border-white/10"
+            title="Open on YouTube"
+          >
+            <span>YouTube</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+          <img
+            src={user.avatar}
+            alt={user.name}
+            className="w-7 h-7 rounded-full object-cover ring-1 ring-white/10"
+          />
+        </div>
       </div>
 
       {/* Main Video Player Screen (Matching Image 1) */}
@@ -145,7 +165,8 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
       >
         {useNativeEmbed ? (
           <iframe
-            src={`https://www.youtube-nocookie.com/embed/${video.youtubeVideoId}?autoplay=1&rel=0&modestbranding=1`}
+            key={embedUrl}
+            src={embedUrl}
             title={video.title}
             className="w-full h-full border-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

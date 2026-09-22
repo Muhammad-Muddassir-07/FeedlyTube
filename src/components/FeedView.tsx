@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { RotateCw, Clock, ArrowUpDown, ShieldCheck, ArrowUp, SlidersHorizontal } from 'lucide-react';
+import { RotateCw, Clock, ArrowUpDown, ShieldCheck, ArrowUp, SlidersHorizontal, Plus, Youtube } from 'lucide-react';
 import { VideoCard } from './VideoCard';
 import { Video } from '../types';
 
@@ -13,6 +13,7 @@ interface FeedViewProps {
   onToggleSave: (videoId: string) => void;
   onToggleWatched: (videoId: string) => void;
   onNavigateToChannels: () => void;
+  onOpenAddVideo: () => void;
   onAddToFolder?: (videoId: string) => void;
   onMuteChannel?: (channelId: string) => void;
 }
@@ -27,6 +28,7 @@ export const FeedView: React.FC<FeedViewProps> = ({
   onToggleSave,
   onToggleWatched,
   onNavigateToChannels,
+  onOpenAddVideo,
   onAddToFolder,
   onMuteChannel,
 }) => {
@@ -86,18 +88,30 @@ export const FeedView: React.FC<FeedViewProps> = ({
           </p>
         </div>
 
-        {/* Sync Status Button */}
-        <button
-          id="feed-sync-button"
-          onClick={onRefresh}
-          disabled={isSyncing}
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-[#13161B] hover:bg-[#1A1F26] text-[#9CA3AF] hover:text-[#e2e2e6] border border-white/5 transition-all cursor-pointer"
-          title="Refresh subscription feed"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#06B6D4] animate-pulse" />
-          <span>Up to date • {lastSynced}</span>
-          <RotateCw className={`w-3.5 h-3.5 ml-0.5 text-[#06B6D4] ${isSyncing ? 'animate-spin' : ''}`} />
-        </button>
+        {/* Action Buttons: Add Video & Sync Status */}
+        <div className="flex items-center gap-2">
+          <button
+            id="feed-add-video-btn"
+            onClick={onOpenAddVideo}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-[#6366F1]/20 hover:bg-[#6366F1]/30 text-[#818CF8] border border-[#6366F1]/40 transition-all cursor-pointer shadow-sm"
+            title="Add any YouTube video URL"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Video</span>
+          </button>
+
+          <button
+            id="feed-sync-button"
+            onClick={onRefresh}
+            disabled={isSyncing}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-full bg-[#13161B] hover:bg-[#1A1F26] text-[#9CA3AF] hover:text-[#e2e2e6] border border-white/5 transition-all cursor-pointer"
+            title="Refresh subscription feed"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#06B6D4] animate-pulse" />
+            <span>Up to date • {lastSynced}</span>
+            <RotateCw className={`w-3.5 h-3.5 ml-0.5 text-[#06B6D4] ${isSyncing ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
 
       {/* Subhead Row: Deterministic Timeline & Sort selector */}

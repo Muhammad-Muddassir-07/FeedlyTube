@@ -9,6 +9,8 @@ import { FoldersView } from './components/FoldersView';
 import { SettingsView } from './components/SettingsView';
 import { SearchModal } from './components/SearchModal';
 import { ConnectYouTubeModal } from './components/ConnectYouTubeModal';
+import { AddVideoModal } from './components/AddVideoModal';
+import { AddChannelModal } from './components/AddChannelModal';
 import {
   INITIAL_USER,
   INITIAL_CHANNELS,
@@ -31,7 +33,19 @@ export default function App() {
 
   const [videos, setVideos] = useState<Video[]>(() => {
     const saved = localStorage.getItem('feedlytube_videos');
-    return saved ? JSON.parse(saved) : INITIAL_VIDEOS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // If it contains old broken video IDs, refresh with INITIAL_VIDEOS
+        if (Array.isArray(parsed) && parsed.some((v: Video) => v.youtubeVideoId?.includes('hardware-rams') || v.youtubeVideoId?.includes('veritasium-noise'))) {
+          return INITIAL_VIDEOS;
+        }
+        return parsed;
+      } catch (e) {
+        return INITIAL_VIDEOS;
+      }
+    }
+    return INITIAL_VIDEOS;
   });
 
   const [collections, setCollections] = useState<Collection[]>(() => {
@@ -43,6 +57,8 @@ export default function App() {
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [isAddVideoOpen, setIsAddVideoOpen] = useState(false);
+  const [isAddChannelOpen, setIsAddChannelOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
   // Sync to localStorage
@@ -125,6 +141,14 @@ export default function App() {
     setVideos((prev) => prev.map((v) => ({ ...v, isSaved: false })));
   };
 
+  const handleAddCustomVideo = (newVideo: Video) => {
+    setVideos((prev) => [newVideo, ...prev]);
+  };
+
+  const handleAddCustomChannel = (newChannel: Channel) => {
+    setChannels((prev) => [newChannel, ...prev]);
+  };
+
   return (
     <div className="min-h-screen bg-[#0B0D10] text-[#e2e2e6] flex flex-col selection:bg-[#6366F1]/30">
       {/* Top Header */}
@@ -171,6 +195,7 @@ export default function App() {
                 onToggleSave={handleToggleSave}
                 onToggleWatched={handleToggleWatched}
                 onNavigateToChannels={() => setCurrentTab('channels')}
+                onOpenAddVideo={() => setIsAddVideoOpen(true)}
               />
             )}
 
@@ -185,6 +210,7 @@ export default function App() {
                 onSelectVideo={(v) => setActiveVideo(v)}
                 onToggleSave={handleToggleSave}
                 onToggleWatched={handleToggleWatched}
+                onOpenAddChannel={() => setIsAddChannelOpen(true)}
               />
             )}
 
@@ -253,13 +279,30 @@ export default function App() {
         }}
       />
 
-      {/* Connect YouTube Modal (Step 2 of 4) */}
+      {/* Connect YouTube Modal */}
       <ConnectYouTubeModal
         isOpen={isConnectModalOpen}
         onClose={() => setIsConnectModalOpen(false)}
         onConnectSuccess={() => {
           setUser((prev) => ({ ...prev, isGoogleConnected: true, lastSyncedAt: 'just now' }));
         }}
+      />
+
+      {/* Add Custom Video Modal */}
+      <AddVideoModal
+        isOpen={isAddVideoOpen}
+        onClose={() => setIsAddVideoOpen(false)}
+        onAddVideo={handleAddCustomVideo}
+        onPlayDirectly={(v) => {
+          setActiveVideo(v);
+        }}
+      />
+
+      {/* Add Custom Channel Modal */}
+      <AddChannelModal
+        isOpen={isAddChannelOpen}
+        onClose={() => setIsAddChannelOpen(false)}
+        onAddChannel={handleAddCustomChannel}
       />
     </div>
   );

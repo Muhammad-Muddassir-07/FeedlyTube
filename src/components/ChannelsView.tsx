@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Bell, BellOff, MoreVertical, RotateCw, Star, CheckCircle, ArrowUpDown, ExternalLink, X } from 'lucide-react';
+import { Search, Bell, BellOff, MoreVertical, RotateCw, Star, CheckCircle, ArrowUpDown, ExternalLink, X, Plus } from 'lucide-react';
 import { Channel, Video } from '../types';
 import { VideoCard } from './VideoCard';
 
@@ -13,6 +13,7 @@ interface ChannelsViewProps {
   onSelectVideo: (video: Video) => void;
   onToggleSave: (videoId: string) => void;
   onToggleWatched: (videoId: string) => void;
+  onOpenAddChannel: () => void;
 }
 
 export const ChannelsView: React.FC<ChannelsViewProps> = ({
@@ -25,6 +26,7 @@ export const ChannelsView: React.FC<ChannelsViewProps> = ({
   onSelectVideo,
   onToggleSave,
   onToggleWatched,
+  onOpenAddChannel,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'favorites' | 'muted'>('all');
@@ -76,6 +78,16 @@ export const ChannelsView: React.FC<ChannelsViewProps> = ({
             </button>
           )}
         </div>
+
+        <button
+          id="channels-add-channel-btn"
+          onClick={onOpenAddChannel}
+          className="flex items-center gap-1.5 px-3 py-2.5 bg-[#06B6D4]/20 hover:bg-[#06B6D4]/30 border border-[#06B6D4]/40 rounded-xl text-xs font-semibold text-[#06B6D4] cursor-pointer"
+          title="Add New Subscription"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="hidden sm:inline">Add</span>
+        </button>
 
         <button
           onClick={() => {

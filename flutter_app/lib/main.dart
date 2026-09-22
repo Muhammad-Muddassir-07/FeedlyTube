@@ -6,6 +6,7 @@ import 'services/mock_data_service.dart';
 import 'screens/feed_screen.dart';
 import 'screens/channels_screen.dart';
 import 'screens/connect_screen.dart';
+import 'screens/queue_screen.dart';
 
 void main() {
   runApp(const FeedlyTubeApp());
@@ -103,15 +104,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         onToggleMute: _handleToggleMute,
       ),
       // Queue (Watch Later)
-      Scaffold(
-        backgroundColor: FeedlyColors.canvas,
-        appBar: AppBar(title: const Text('Watch Later Queue')),
-        body: Center(
-          child: Text(
-            '${_videos.where((v) => v.isSaved).length} videos saved to watch later',
-            style: const TextStyle(color: FeedlyColors.textSecondary),
-          ),
-        ),
+      QueueScreen(
+        videos: _videos,
+        onToggleSave: _handleToggleSave,
+        onToggleWatched: _handleToggleWatched,
       ),
       // Connect / Settings
       const ConnectScreen(),
