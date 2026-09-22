@@ -1,0 +1,6 @@
+{
+  "name": "FeedlyTube",
+  "description": "Your subscriptions. Your feed. Your focus. A clean, distraction-free subscription video feed with zero algorithmic interruptions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
